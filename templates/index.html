@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Local File Browser</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface-hover: #222531;
+      --border: #2a2d3a;
+      --text: #e4e6ed;
+      --text-muted: #8b8fa3;
+      --accent: #6c8cff;
+      --accent-hover: #5a7af0;
+      --danger: #f06060;
+      --success: #50c878;
+      --warning: #f0c040;
+      --radius: 8px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .breadcrumb button {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .breadcrumb button:hover { background: var(--surface-hover); }
+    .breadcrumb .sep { color: var(--text-muted); font-size: 12px; }
+    .breadcrumb .current { color: var(--text); cursor: default; }
+    .breadcrumb .current:hover { background: none; }
+
+    .search-box {
+      position: relative;
+      width: 260px;
+      flex-shrink: 0;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-box input:focus { border-color: var(--accent); }
+
+    .search-box .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 53px);
+    }
+
+    .file-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .file-list.with-preview { flex: 0 0 45%; border-right: 1px solid var(--border); }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.15s;
+      border: 1px solid transparent;
+    }
+
+    .file-item:hover { background: var(--surface-hover); border-color: var(--border); }
+    .file-item.selected { background: var(--surface); border-color: var(--accent); }
+
+    .file-icon {
+      font-size: 20px;
+      width: 28px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .file-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .file-name {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+    }
+
+    .file-size {
+      color: var(--text-muted);
+      font-size: 13px;
+      flex-shrink: 0;
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .preview-panel {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-header {
+      padding: 16px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .preview-header h3 {
+      font-size: 15px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .preview-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .btn {
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover { background: var(--surface-hover); border-color: var(--accent); }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    .preview-body {
+      flex: 1;
+      overflow: auto;
+      padding: 0;
+    }
+
+    .preview-body pre {
+      margin: 0;
+      padding: 20px;
+      font-family: "JetBrains Mono", "Fira Code", "SF Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: var(--text);
+      counter-reset: line;
+    }
+
+    .preview-body .line {
+      display: block;
+      padding-left: 50px;
+      position: relative;
+    }
+
+    .preview-body .line::before {
+      counter-increment: line;
+      content: counter(line);
+      position: absolute;
+      left: 0;
+      width: 40px;
+      text-align: right;
+      color: var(--text-muted);
+      opacity: 0.4;
+      font-size: 12px;
+    }
+
+    .preview-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-muted);
+      gap: 12px;
+      padding: 40px;
+    }
+
+    .preview-placeholder .icon { font-size: 48px; opacity: 0.3; }
+    .preview-placeholder p { font-size: 14px; text-align: center; }
+
+    .file-detail-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 8px 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .file-detail-grid dt { color: var(--text-muted); }
+    .file-detail-grid dd { color: var(--text); word-break: break-all; }
+
+    .back-item {
+      color: var(--text-muted);
+    }
+
+    .back-item .file-name { color: var(--text-muted); }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      padding: 20px;
+      color: var(--danger);
+      text-align: center;
+    }
+
+    .empty-dir {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .search-results-header {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .search-results-header button {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .image-preview {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      padding: 20px;
+    }
+
+    @media (max-width: 768px) {
+      header { flex-wrap: wrap; padding: 10px 12px; }
+      .search-box { width: 100%; order: 10; }
+      .container { flex-direction: column; }
+      .file-list.with-preview { flex: 0 0 40%; border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">File Browser</div>
+    <nav class="breadcrumb" id="breadcrumb"></nav>
+    <div class="search-box">
+      <span class="search-icon">&#128269;</span>
+      <input type="text" id="searchInput" placeholder="Search files..." />
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="file-list" id="fileList"></div>
+    <div class="preview-panel" id="previewPanel" style="display:none"></div>
+  </div>
+
+  <script>
+    const ICON_MAP = {
+      directory: "\u{1F4C1}",
+      py: "\u{1F40D}",
+      js: "\u{1F7E8}",
+      ts: "\u{1F535}",
+      jsx: "\u{269B}\uFE0F",
+      tsx: "\u{269B}\uFE0F",
+      html: "\u{1F310}",
+      css: "\u{1F3A8}",
+      json: "\u{1F4CB}",
+      md: "\u{1F4DD}",
+      txt: "\u{1F4C4}",
+      sh: "\u{1F4DF}",
+      yml: "\u{2699}\uFE0F",
+      yaml: "\u{2699}\uFE0F",
+      toml: "\u{2699}\uFE0F",
+      xml: "\u{1F4C3}",
+      sql: "\u{1F5C3}\uFE0F",
+      go: "\u{1F439}",
+      rs: "\u{1F980}",
+      rb: "\u{1F48E}",
+      java: "\u{2615}",
+      c: "\u{1F1E8}",
+      cpp: "\u{1F1E8}",
+      h: "\u{1F1ED}",
+      php: "\u{1F418}",
+      swift: "\u{1F426}",
+      kt: "\u{1F1F0}",
+      r: "\u{1F4CA}",
+      csv: "\u{1F4CA}",
+      log: "\u{1F4DC}",
+      env: "\u{1F510}",
+      lock: "\u{1F512}",
+      png: "\u{1F5BC}\uFE0F",
+      jpg: "\u{1F5BC}\uFE0F",
+      jpeg: "\u{1F5BC}\uFE0F",
+      gif: "\u{1F5BC}\uFE0F",
+      svg: "\u{1F5BC}\uFE0F",
+      webp: "\u{1F5BC}\uFE0F",
+      ico: "\u{1F5BC}\uFE0F",
+      pdf: "\u{1F4D5}",
+      zip: "\u{1F4E6}",
+      tar: "\u{1F4E6}",
+      gz: "\u{1F4E6}",
+    };
+
+    const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico", ".bmp"]);
+
+    let currentPath = ".";
+    let selectedFile = null;
+    let searchMode = false;
+    let searchTimeout = null;
+
+    function getIcon(item) {
+      if (item.type === "directory") return ICON_MAP.directory;
+      const ext = (item.extension || "").replace(".", "");
+      return ICON_MAP[ext] || "\u{1F4C4}";
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function updateBreadcrumb() {
+      const bc = document.getElementById("breadcrumb");
+      const parts = currentPath === "." ? [] : currentPath.split("/").filter(Boolean);
+
+      let html = `<button onclick="navigate('.')">Root</button>`;
+      let accumulated = "";
+
+      parts.forEach((part, i) => {
+        accumulated += (accumulated ? "/" : "") + part;
+        const isLast = i === parts.length - 1;
+        html += `<span class="sep">/</span>`;
+        if (isLast) {
+          html += `<button class="current">${escapeHtml(part)}</button>`;
+        } else {
+          const p = accumulated;
+          html += `<button onclick="navigate('${escapeHtml(p)}')">${escapeHtml(part)}</button>`;
+        }
+      });
+
+      bc.innerHTML = html;
+    }
+
+    async function navigate(path) {
+      currentPath = path;
+      searchMode = false;
+      document.getElementById("searchInput").value = "";
+      selectedFile = null;
+      hidePreview();
+      updateBreadcrumb();
+      await loadDirectory(path);
+    }
+
+    async function loadDirectory(path) {
+      const fileList = document.getElementById("fileList");
+      fileList.innerHTML = `<div class="loading"><div class="spinner"></div> Loading...</div>`;
+
+      try {
+        const res = await fetch(`/api/browse?path=${encodeURIComponent(path)}`);
+        if (!res.ok) throw new Error((await res.json()).description || res.statusText);
+        const data = await res.json();
+        renderFileList(data);
+      } catch (err) {
+        fileList.innerHTML = `<div class="error-msg">Error: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    function renderFileList(data) {
+      const fileList = document.getElementById("fileList");
+
+      if (data.items.length === 0 && !data.parent) {
+        fileList.innerHTML = `<div class="empty-dir">This directory is empty</div>`;
+        return;
+      }
+
+      let html = "";
+
+      if (data.parent !== null && data.parent !== undefined) {
+        html += `
+          <div class="file-item back-item" onclick="navigate('${escapeHtml(data.parent || '.')}')">
+            <div class="file-icon">\u{2B06}\uFE0F</div>
+            <div class="file-info">
+              <div class="file-name">..</div>
+              <div class="file-meta"><span>Parent directory</span></div>
+            </div>
+          </div>`;
+      }
+
+      data.items.forEach(item => {
+        if (item.error) {
+          html += `
+            <div class="file-item" style="opacity:0.5">
+              <div class="file-icon">\u{1F6AB}</div>
+              <div class="file-info">
+                <div class="file-name">${escapeHtml(item.name)}</div>
+                <div class="file-meta"><span>${escapeHtml(item.error)}</span></div>
+              </div>
+            </div>`;
+          return;
+        }
+
+        const icon = getIcon(item);
+        const relPath = item.relative_path;
+        const modified = new Date(item.modified).toLocaleDateString(undefined, {
+          year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+        });
+
+        if (item.type === "directory") {
+          html += `
+            <div class="file-item" onclick="navigate('${escapeHtml(relPath)}')">
+              <div class="file-icon">${icon}</div>
+              <div class="file-info">
+                <div class="file-name">${escapeHtml(item.name)}</div>
+                <div class="file-meta"><span>${modified}</span></div>
+              </div>
+              <div class="file-size">&mdash;</div>
+            </div>`;
+        } else {
+          html += `
+            <div class="file-item" data-path="${escapeHtml(relPath)}" onclick="selectFile('${escapeHtml(relPath)}', this)">
+              <div class="file-icon">${icon}</div>
+              <div class="file-info">
+                <div class="file-name">${escapeHtml(item.name)}</div>
+                <div class="file-meta">
+                  <span>${modified}</span>
+                  ${item.mime_type ? `<span>${escapeHtml(item.mime_type)}</span>` : ""}
+                </div>
+              </div>
+              <div class="file-size">${escapeHtml(item.size_human)}</div>
+            </div>`;
+        }
+      });
+
+      fileList.innerHTML = html;
+    }
+
+    async function selectFile(path, el) {
+      document.querySelectorAll(".file-item.selected").forEach(e => e.classList.remove("selected"));
+      if (el) el.classList.add("selected");
+      selectedFile = path;
+
+      const fileList = document.getElementById("fileList");
+      fileList.classList.add("with-preview");
+
+      const panel = document.getElementById("previewPanel");
+      panel.style.display = "flex";
+      panel.innerHTML = `<div class="loading"><div class="spinner"></div> Loading preview...</div>`;
+
+      try {
+        const res = await fetch(`/api/file?path=${encodeURIComponent(path)}`);
+        if (!res.ok) throw new Error((await res.json()).description || res.statusText);
+        const data = await res.json();
+        renderPreview(data);
+      } catch (err) {
+        panel.innerHTML = `<div class="error-msg">Error: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    function renderPreview(data) {
+      const panel = document.getElementById("previewPanel");
+      const isImage = IMAGE_EXTS.has((data.extension || "").toLowerCase());
+      const downloadUrl = `/api/download?path=${encodeURIComponent(data.relative_path)}`;
+
+      let html = `
+        <div class="preview-header">
+          <h3>${escapeHtml(data.name)}</h3>
+          <div class="preview-actions">
+            <a class="btn btn-primary" href="${downloadUrl}" download>Download</a>
+            <button class="btn" onclick="hidePreview()">Close</button>
+          </div>
+        </div>
+        <dl class="file-detail-grid">
+          <dt>Size</dt><dd>${escapeHtml(data.size_human)} (${data.size.toLocaleString()} bytes)</dd>
+          <dt>Modified</dt><dd>${new Date(data.modified).toLocaleString()}</dd>
+          <dt>Type</dt><dd>${escapeHtml(data.mime_type || "unknown")}</dd>
+          <dt>Path</dt><dd>${escapeHtml(data.path)}</dd>
+          ${data.is_symlink ? "<dt>Symlink</dt><dd>Yes</dd>" : ""}
+        </dl>`;
+
+      if (isImage) {
+        html += `
+          <div class="preview-body" style="display:flex;align-items:center;justify-content:center;">
+            <img class="image-preview" src="${downloadUrl}" alt="${escapeHtml(data.name)}" />
+          </div>`;
+      } else if (data.preview_type === "text" && data.content != null) {
+        const lines = data.content.split("\n").map(l => `<span class="line">${escapeHtml(l)}</span>`).join("");
+        html += `<div class="preview-body"><pre>${lines}</pre></div>`;
+      } else {
+        html += `
+          <div class="preview-body">
+            <div class="preview-placeholder">
+              <div class="icon">\u{1F4E6}</div>
+              <p>Binary file &mdash; no preview available.<br>Use the Download button to save this file.</p>
+            </div>
+          </div>`;
+      }
+
+      panel.innerHTML = html;
+    }
+
+    function hidePreview() {
+      document.getElementById("previewPanel").style.display = "none";
+      document.getElementById("fileList").classList.remove("with-preview");
+      document.querySelectorAll(".file-item.selected").forEach(e => e.classList.remove("selected"));
+      selectedFile = null;
+    }
+
+    async function performSearch(query) {
+      if (!query.trim()) {
+        searchMode = false;
+        await navigate(currentPath);
+        return;
+      }
+
+      searchMode = true;
+      const fileList = document.getElementById("fileList");
+      fileList.innerHTML = `<div class="loading"><div class="spinner"></div> Searching...</div>`;
+
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&path=${encodeURIComponent(currentPath)}`);
+        if (!res.ok) throw new Error((await res.json()).description || res.statusText);
+        const data = await res.json();
+
+        let html = `
+          <div class="search-results-header">
+            <span>${data.count} result${data.count !== 1 ? "s" : ""} for "${escapeHtml(data.query)}"</span>
+            <button onclick="navigate(currentPath)">Clear search</button>
+          </div>`;
+
+        data.results.forEach(item => {
+          const icon = getIcon(item);
+          const relPath = item.relative_path;
+
+          if (item.type === "directory") {
+            html += `
+              <div class="file-item" onclick="navigate('${escapeHtml(relPath)}')">
+                <div class="file-icon">${icon}</div>
+                <div class="file-info">
+                  <div class="file-name">${escapeHtml(item.name)}</div>
+                  <div class="file-meta"><span>${escapeHtml(relPath)}</span></div>
+                </div>
+              </div>`;
+          } else {
+            html += `
+              <div class="file-item" onclick="selectFile('${escapeHtml(relPath)}', this)">
+                <div class="file-icon">${icon}</div>
+                <div class="file-info">
+                  <div class="file-name">${escapeHtml(item.name)}</div>
+                  <div class="file-meta"><span>${escapeHtml(relPath)}</span></div>
+                </div>
+                <div class="file-size">${escapeHtml(item.size_human)}</div>
+              </div>`;
+          }
+        });
+
+        if (data.count === 0) {
+          html += `<div class="empty-dir">No files found matching "${escapeHtml(data.query)}"</div>`;
+        }
+
+        fileList.innerHTML = html;
+      } catch (err) {
+        fileList.innerHTML = `<div class="error-msg">Search error: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => performSearch(e.target.value), 300);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") hidePreview();
+    });
+
+    navigate(".");
+  </script>
+</body>
+</html>
