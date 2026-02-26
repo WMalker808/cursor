@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guardian Style Guide</title>
+  <style>
+    :root {
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --guardian-blue: #052962;
+      --guardian-blue-light: #506991;
+      --guardian-red: #c70000;
+      --guardian-yellow: #ffe500;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666;
+      --bg-primary: #f6f6f6;
+      --bg-card: #ffffff;
+      --border: #dcdcdc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-serif);
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+      line-height: 1.6;
+    }
+
+    header { margin-bottom: 0; }
+
+    h1 {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: var(--guardian-blue);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .epigraph {
+      font-style: italic;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      border-left: 3px solid var(--guardian-yellow);
+      padding-left: 12px;
+      line-height: 1.5;
+    }
+
+    /* ---- Tabs ---- */
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--guardian-blue);
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      color: var(--guardian-blue-light);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.15s;
+    }
+
+    .tab-btn:hover { color: var(--guardian-blue); }
+
+    .tab-btn.active {
+      color: var(--guardian-blue);
+      border-bottom-color: var(--guardian-blue);
+      background: var(--bg-card);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---- Search tab ---- */
+    .search-container {
+      position: sticky;
+      top: 0;
+      background: var(--bg-primary);
+      padding: 8px 0 4px;
+      z-index: 10;
+    }
+
+    #search {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1.05rem;
+      font-family: var(--font-sans);
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s;
+      background: var(--bg-card);
+    }
+
+    #search:focus { border-color: var(--guardian-blue); }
+    #search::placeholder { color: #999; }
+
+    .search-info {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      min-height: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .search-hint { font-size: 0.75rem; color: #999; }
+
+    .letter-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      margin: 12px 0 16px;
+    }
+
+    .letter-nav button {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 5px 9px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--bg-card);
+      cursor: pointer;
+      color: var(--guardian-blue);
+      transition: all 0.12s;
+    }
+
+    .letter-nav button:hover,
+    .letter-nav button.active {
+      background: var(--guardian-blue);
+      color: white;
+      border-color: var(--guardian-blue);
+    }
+
+    /* ---- Shared entry styles ---- */
+    .entry {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 14px 18px;
+      margin-bottom: 6px;
+    }
+
+    .entry-term {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--guardian-blue);
+      margin-bottom: 2px;
+    }
+
+    .entry-aliases {
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .entry-body {
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .entry-body p { margin: 0 0 8px 0; }
+    .entry-body p:last-child { margin-bottom: 0; }
+    .entry-body strong { color: var(--text-primary); }
+    .entry-body em { font-style: italic; }
+    .entry-body a { color: var(--guardian-red); text-decoration: none; }
+    .entry-body a:hover { text-decoration: underline; }
+
+    .section-divider {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: 1.6rem;
+      color: var(--guardian-blue);
+      border-bottom: 3px solid var(--guardian-blue);
+      padding: 20px 0 4px 0;
+      margin: 20px 0 10px 0;
+    }
+
+    .section-divider:first-child { margin-top: 0; }
+
+    mark {
+      background: var(--guardian-yellow);
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    .no-results, .welcome, .loading {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+    }
+
+    .welcome p { margin-bottom: 8px; font-size: 0.95rem; }
+    .welcome .big { font-size: 1.1rem; color: var(--text-primary); margin-bottom: 16px; }
+    .no-results { font-size: 1rem; }
+
+.check-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .check-btn {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: var(--guardian-blue);
+      color: white;
+      transition: background 0.15s;
+    }
+
+    .check-btn:hover { background: #0a3d8f; }
+
+    .clear-btn {
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 9px 16px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      cursor: pointer;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+
+    .clear-btn:hover { border-color: #999; color: var(--text-primary); }
+
+    .check-info {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-left: auto;
+    }
+
+.match-count-summary {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+    }
+
+    .match-count-summary strong {
+      color: var(--guardian-blue);
+    }
+
+    .matched-entries-header {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--guardian-blue);
+      margin: 20px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--guardian-blue);
+    }
+
+    .entry.no-body {
+      border-left: 3px solid #4caf50;
+    }
+
+    .entry.has-body {
+      border-left: 3px solid var(--guardian-yellow);
+    }
+
+    .entry-tag {
+      font-family: var(--font-sans);
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .tag-correct {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .tag-guidance {
+      background: #fff8e1;
+      color: #f57f17;
+    }
+
+    /* ---- Check names tab ---- */
+    #names-input {
+      width: 100%;
+      min-height: 200px;
+      padding: 14px 16px;
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      line-height: 1.6;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+      resize: vertical;
+      background: var(--bg-card);
+      transition: border-color 0.2s;
+    }
+
+    #names-input:focus { border-color: var(--guardian-blue); }
+    #names-input::placeholder { color: #999; }
+
+    .name-progress {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 12px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      margin-bottom: 12px;
+    }
+
+    .name-progress .bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .name-progress .bar-fill {
+      height: 100%;
+      background: var(--guardian-blue);
+      border-radius: 2px;
+      transition: width 0.2s;
+    }
+
+    .name-result {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 12px 16px;
+      margin-bottom: 6px;
+    }
+
+    .name-result.status-correct {
+      border-left: 3px solid #4caf50;
+    }
+
+    .name-result.status-misspelled {
+      border-left: 3px solid var(--guardian-red);
+    }
+
+    .name-result.status-inconclusive {
+      border-left: 3px solid #f0a500;
+    }
+
+    .name-result.status-not-found {
+      border-left: 3px solid #999;
+    }
+
+    .name-result-header {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .name-result-header .name-in-text {
+      color: var(--text-primary);
+    }
+
+    .name-result-header .arrow {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .name-result-header .name-correct {
+      color: var(--guardian-red);
+    }
+
+    .name-status-tag {
+      font-family: var(--font-sans);
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .name-status-tag.correct {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .name-status-tag.misspelled {
+      background: #fce4ec;
+      color: #c62828;
+    }
+
+    .name-status-tag.inconclusive {
+      background: #fff8e1;
+      color: #e68a00;
+    }
+
+    .name-status-tag.not-found {
+      background: #f5f5f5;
+      color: #757575;
+    }
+
+    .name-result .wiki-link {
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .name-result .wiki-link a {
+      color: var(--guardian-blue-light);
+      text-decoration: none;
+    }
+
+    .name-result .wiki-link a:hover {
+      text-decoration: underline;
+    }
+
+    .names-annotated {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px 20px;
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin-bottom: 20px;
+    }
+
+    .names-annotated .name-ok {
+      background: #e8f5e9;
+      padding: 1px 3px;
+      border-radius: 3px;
+      border-bottom: 2px solid #4caf50;
+    }
+
+    .names-annotated .name-bad {
+      background: #fce4ec;
+      padding: 1px 3px;
+      border-radius: 3px;
+      border-bottom: 2px solid var(--guardian-red);
+      cursor: pointer;
+    }
+
+    .names-annotated .name-inconclusive {
+      background: #fff8e1;
+      padding: 1px 3px;
+      border-radius: 3px;
+      border-bottom: 2px solid #f0a500;
+    }
+
+    .names-annotated .name-unknown {
+      background: #f5f5f5;
+      padding: 1px 3px;
+      border-radius: 3px;
+      border-bottom: 2px solid #999;
+    }
+
+    @media (max-width: 500px) {
+      body { padding: 12px 10px 40px; }
+      h1 { font-size: 1.4rem; }
+      .letter-nav button { padding: 6px 7px; font-size: 0.75rem; }
+      .entry { padding: 12px 14px; }
+      .tab-btn { padding: 8px 14px; font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Guardian Style Guide</h1>
+    <p class="epigraph">'Style to be good must be clear. Clearness is secured by using words that are current and ordinary.' &mdash; Aristotle</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="search-tab">Search</button>
+    <button class="tab-btn" data-tab="names-tab">Check names</button>
+  </div>
+
+  <!-- ============ SEARCH TAB ============ -->
+  <div id="search-tab" class="tab-panel active">
+    <div class="search-container">
+      <input type="search" id="search" placeholder="Search entries or concepts..." autocomplete="off" autofocus>
+      <div class="search-info">
+        <span id="info-text"></span>
+        <span class="search-hint" id="hint-text">Press / to focus &middot; Esc to clear</span>
+      </div>
+    </div>
+    <nav class="letter-nav" id="letter-nav"></nav>
+    <div id="results">
+      <div class="loading">Loading style guide...</div>
+    </div>
+  </div>
+
+  <!-- ============ CHECK NAMES TAB ============ -->
+  <div id="names-tab" class="tab-panel">
+    <textarea id="names-input" placeholder="Paste your article text here to check name spellings..."></textarea>
+    <div class="check-actions">
+      <button class="check-btn" id="names-btn">Check names</button>
+      <button class="clear-btn" id="names-clear-btn">Clear</button>
+      <span class="check-info" id="names-info"></span>
+    </div>
+    <div id="names-output"></div>
+  </div>
+
+  <script src="style_guide_data.js"></script>
+  <script>
+    (function() {
+      'use strict';
+
+      var allEntries = [];
+      var activeLetter = null;
+      // ---- Initialization ----
+      function init() {
+        allEntries = STYLE_GUIDE_DATA.entries;
+        buildLetterNav();
+        showWelcome();
+        initTabs();
+        initSearch();
+        initNameChecker();
+      }
+
+      // ============================================================
+      // TABS
+      // ============================================================
+
+      function initTabs() {
+        var tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            tabBtns.forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(function(p) {
+              p.classList.remove('active');
+            });
+            document.getElementById(btn.dataset.tab).classList.add('active');
+            // Focus the right input
+            if (btn.dataset.tab === 'search-tab') {
+              document.getElementById('search').focus();
+            } else if (btn.dataset.tab === 'names-tab') {
+              document.getElementById('names-input').focus();
+            }
+          });
+        });
+      }
+
+      // ============================================================
+      // SEARCH ENGINE
+      // ============================================================
+
+      function initSearch() {
+        var searchInput = document.getElementById('search');
+        searchInput.addEventListener('input', debounce(onSearch, 120));
+
+        document.addEventListener('keydown', function(e) {
+          // Only handle shortcuts when search tab is active
+          if (!document.getElementById('search-tab').classList.contains('active')) return;
+          if (e.key === '/' && document.activeElement !== searchInput) {
+            e.preventDefault();
+            searchInput.focus();
+          }
+          if (e.key === 'Escape') {
+            searchInput.value = '';
+            searchInput.blur();
+            activeLetter = null;
+            setActiveNav(null);
+            showWelcome();
+            updateInfo('');
+          }
+        });
+      }
+
+      function search(query) {
+        var q = query.toLowerCase().trim();
+        if (q.length < 2) return [];
+
+        var scored = [];
+        var queryWords = q.split(/\s+/);
+
+        for (var i = 0; i < allEntries.length; i++) {
+          var entry = allEntries[i];
+          var termLower = entry.term.toLowerCase();
+          var aliasesLower = (entry.aliases || []).map(function(a) { return a.toLowerCase(); });
+          var bodyLower = entry.body.toLowerCase();
+          var score = 0;
+
+          if (termLower === q) {
+            score = 100;
+          } else if (termLower.startsWith(q)) {
+            score = 80;
+          } else if (termLower.indexOf(q) !== -1) {
+            score = 60;
+          } else if (allWordsMatch(queryWords, termLower)) {
+            score = 55;
+          }
+
+          if (score < 80) {
+            for (var a = 0; a < aliasesLower.length; a++) {
+              if (aliasesLower[a] === q) {
+                score = Math.max(score, 75);
+              } else if (aliasesLower[a].indexOf(q) !== -1) {
+                score = Math.max(score, 55);
+              }
+            }
+          }
+
+          if (score < 50) {
+            if (allWordsMatch(queryWords, bodyLower)) {
+              var proximity = wordProximity(queryWords, bodyLower);
+              if (queryWords.length > 1 && proximity <= 5) {
+                score = Math.max(score, 40);
+              } else if (queryWords.length > 1) {
+                score = Math.max(score, 25);
+              } else {
+                var wordBoundary = new RegExp('\\b' + escapeRegex(q) + '\\b', 'i');
+                if (wordBoundary.test(entry.body)) {
+                  score = Math.max(score, 30);
+                } else {
+                  score = Math.max(score, 10);
+                }
+              }
+            }
+          }
+
+          if (score > 0) {
+            scored.push({ entry: entry, score: score });
+          }
+        }
+
+        scored.sort(function(a, b) {
+          if (b.score !== a.score) return b.score - a.score;
+          return a.entry.term.localeCompare(b.entry.term);
+        });
+
+        if (scored.length > 0) return scored.slice(0, 50);
+
+        // Phase 2: fuzzy fallback
+        var fuzzyResults = [];
+        for (var j = 0; j < allEntries.length; j++) {
+          var e = allEntries[j];
+          var dist = editDistance(q, e.term.toLowerCase());
+          var maxDist = Math.max(1, Math.floor(q.length / 3));
+          if (dist <= maxDist) {
+            fuzzyResults.push({ entry: e, score: 50 - dist * 10 });
+          }
+          for (var k = 0; k < (e.aliases || []).length; k++) {
+            var aDist = editDistance(q, e.aliases[k].toLowerCase());
+            if (aDist <= maxDist) {
+              fuzzyResults.push({ entry: e, score: 45 - aDist * 10 });
+            }
+          }
+        }
+
+        fuzzyResults.sort(function(a, b) {
+          if (b.score !== a.score) return b.score - a.score;
+          return a.entry.term.localeCompare(b.entry.term);
+        });
+
+        var seen = {};
+        var deduped = [];
+        for (var d = 0; d < fuzzyResults.length; d++) {
+          if (!seen[fuzzyResults[d].entry.id]) {
+            seen[fuzzyResults[d].entry.id] = true;
+            deduped.push(fuzzyResults[d]);
+          }
+        }
+        return deduped.slice(0, 30);
+      }
+
+      function allWordsMatch(words, text) {
+        for (var i = 0; i < words.length; i++) {
+          if (text.indexOf(words[i]) === -1) return false;
+        }
+        return true;
+      }
+
+      function wordProximity(words, text) {
+        if (words.length < 2) return 0;
+        var positions = [];
+        for (var i = 0; i < words.length; i++) {
+          var idx = text.indexOf(words[i]);
+          if (idx === -1) return 999;
+          positions.push(idx);
+        }
+        positions.sort(function(a, b) { return a - b; });
+        var maxGap = 0;
+        for (var j = 1; j < positions.length; j++) {
+          var between = text.substring(positions[j - 1], positions[j]);
+          var gap = between.split(/\s+/).length;
+          if (gap > maxGap) maxGap = gap;
+        }
+        return maxGap;
+      }
+
+      function editDistance(a, b) {
+        if (a.length === 0) return b.length;
+        if (b.length === 0) return a.length;
+        if (Math.abs(a.length - b.length) > 3) return Math.abs(a.length - b.length);
+        var matrix = [];
+        for (var i = 0; i <= b.length; i++) { matrix[i] = [i]; }
+        for (var j = 0; j <= a.length; j++) { matrix[0][j] = j; }
+        for (var i2 = 1; i2 <= b.length; i2++) {
+          for (var j2 = 1; j2 <= a.length; j2++) {
+            var cost = b.charAt(i2 - 1) === a.charAt(j2 - 1) ? 0 : 1;
+            matrix[i2][j2] = Math.min(
+              matrix[i2 - 1][j2] + 1,
+              matrix[i2][j2 - 1] + 1,
+              matrix[i2 - 1][j2 - 1] + cost
+            );
+          }
+        }
+        return matrix[b.length][a.length];
+      }
+
+
+
+      // ============================================================
+      // NAME CHECKER
+      // ============================================================
+
+      var nameCache = {};
+      var NAME_SERVER = '';
+
+      function initNameChecker() {
+        document.getElementById('names-btn').addEventListener('click', runNameCheck);
+        document.getElementById('names-clear-btn').addEventListener('click', function() {
+          document.getElementById('names-input').value = '';
+          document.getElementById('names-output').innerHTML = '';
+          document.getElementById('names-info').textContent = '';
+          document.getElementById('names-input').focus();
+        });
+      }
+
+      // Keywords in Wikidata short descriptions that indicate a person
+      var PERSON_KEYWORDS = [
+        'politician', 'president', 'prime minister', 'chancellor', 'minister',
+        'senator', 'governor', 'mayor', 'diplomat', 'statesman', 'stateswoman',
+        'leader', 'monarch', 'king', 'queen', 'prince', 'princess', 'emperor',
+        'dictator', 'tyrant', 'revolutionary',
+        'actor', 'actress', 'singer', 'musician', 'composer', 'rapper',
+        'songwriter', 'performer', 'entertainer', 'comedian', 'director',
+        'producer', 'filmmaker', 'artist', 'painter', 'sculptor', 'photographer',
+        'dancer', 'choreographer', 'playwright', 'screenwriter', 'animator',
+        'writer', 'author', 'novelist', 'poet', 'journalist', 'editor',
+        'columnist', 'reporter', 'broadcaster', 'presenter', 'anchor',
+        'commentator', 'correspondent', 'critic', 'blogger', 'essayist',
+        'footballer', 'cricketer', 'athlete', 'player', 'coach', 'manager',
+        'boxer', 'wrestler', 'swimmer', 'runner', 'cyclist', 'skier',
+        'tennis', 'golfer', 'racing driver', 'olympian', 'sportsperson',
+        'scientist', 'physicist', 'chemist', 'biologist', 'mathematician',
+        'astronomer', 'engineer', 'inventor', 'researcher', 'professor',
+        'academic', 'scholar', 'historian', 'philosopher', 'economist',
+        'psychologist', 'sociologist', 'anthropologist', 'archaeologist',
+        'lawyer', 'judge', 'barrister', 'solicitor', 'attorney', 'jurist',
+        'advocate', 'magistrate', 'prosecutor',
+        'businessman', 'businesswoman', 'entrepreneur', 'executive', 'ceo',
+        'founder', 'philanthropist', 'investor', 'magnate', 'tycoon',
+        'general', 'admiral', 'colonel', 'commander', 'officer', 'soldier',
+        'military', 'naval',
+        'doctor', 'surgeon', 'physician', 'nurse', 'psychiatrist',
+        'activist', 'campaigner', 'reformer', 'dissident', 'whistleblower',
+        'religious', 'bishop', 'archbishop', 'cardinal', 'pope', 'priest',
+        'pastor', 'imam', 'rabbi', 'cleric', 'theologian', 'monk', 'nun',
+        'criminal', 'murderer', 'serial killer', 'gangster', 'spy',
+        'model', 'socialite', 'influencer', 'celebrity',
+        'designer', 'architect', 'chef', 'astronaut', 'explorer', 'pilot',
+        'born ', ' born', 'died ', ' died'
+      ];
+
+      function isPerson(description) {
+        if (!description) return false;
+        var d = description.toLowerCase();
+        for (var i = 0; i < PERSON_KEYWORDS.length; i++) {
+          if (d.indexOf(PERSON_KEYWORDS[i]) !== -1) return true;
+        }
+        return false;
+      }
+
+      // Fetch the Wikidata short description for a page title
+      function wikiGetDescription(title) {
+        var url = 'https://en.wikipedia.org/w/api.php?action=query' +
+          '&titles=' + encodeURIComponent(title) +
+          '&prop=description&format=json&origin=*';
+        return fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+          var pages = (data.query || {}).pages || {};
+          var pageIds = Object.keys(pages);
+          if (pageIds.length > 0 && pages[pageIds[0]].description) {
+            return pages[pageIds[0]].description;
+          }
+          return null;
+        }).catch(function() { return null; });
+      }
+
+      // Wikipedia API: Step 1 — check via redirects + description
+      function wikiCheckRedirect(name) {
+        var url = 'https://en.wikipedia.org/w/api.php?action=query' +
+          '&titles=' + encodeURIComponent(name) +
+          '&redirects&prop=description&format=json&origin=*';
+        return fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+          var query = data.query || {};
+          var pages = query.pages || {};
+          var pageIds = Object.keys(pages);
+          var page = pageIds.length > 0 ? pages[pageIds[0]] : {};
+          var description = page.description || '';
+
+          // Check for redirect
+          if (query.redirects && query.redirects.length > 0) {
+            var suggestion = query.redirects[0].to;
+            if (!isPerson(description)) {
+              return { status: 'inconclusive', suggestion: suggestion, description: description };
+            }
+            return { status: 'misspelled', suggestion: suggestion, description: description };
+          }
+          // Check if page exists
+          if (!page.missing) {
+            if (!isPerson(description)) {
+              return { status: 'inconclusive', suggestion: page.title, description: description };
+            }
+            return { status: 'correct', suggestion: page.title, description: description };
+          }
+          // Page missing — need fallback
+          return { status: 'missing' };
+        });
+      }
+
+      // Wikipedia API: Step 2 — opensearch fallback + person check
+      function wikiOpenSearch(name) {
+        var url = 'https://en.wikipedia.org/w/api.php?action=opensearch' +
+          '&search=' + encodeURIComponent(name) +
+          '&limit=3&namespace=0&format=json&origin=*';
+        return fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+          var suggestions = data[1] || [];
+          if (suggestions.length === 0) {
+            return { status: 'not_found', suggestion: null };
+          }
+          // Compare top suggestion with input
+          var top = suggestions[0];
+          var dist = editDistance(name.toLowerCase(), top.toLowerCase());
+          var threshold = Math.max(3, Math.ceil(name.length * 0.35));
+          if (dist <= threshold) {
+            // Verify this is a person before reporting
+            return wikiGetDescription(top).then(function(desc) {
+              if (!isPerson(desc)) {
+                if (dist > 0) {
+                  return { status: 'inconclusive', suggestion: top, description: desc };
+                }
+                return { status: 'inconclusive', suggestion: top, description: desc };
+              }
+              if (dist > 0) {
+                return { status: 'misspelled', suggestion: top, description: desc };
+              }
+              return { status: 'correct', suggestion: top, description: desc };
+            });
+          }
+          return { status: 'not_found', suggestion: null };
+        });
+      }
+
+      // Throttled concurrent execution
+      function throttledMap(items, fn, concurrency) {
+        var results = new Array(items.length);
+        var nextIndex = 0;
+        var completed = 0;
+
+        return new Promise(function(resolve) {
+          function runNext() {
+            if (nextIndex >= items.length) {
+              if (completed >= items.length) resolve(results);
+              return;
+            }
+            var idx = nextIndex++;
+            fn(items[idx], idx).then(function(result) {
+              results[idx] = result;
+              completed++;
+              // Update progress
+              var pct = Math.round((completed / items.length) * 100);
+              var progEl = document.getElementById('names-progress');
+              if (progEl) {
+                progEl.querySelector('.bar-fill').style.width = pct + '%';
+                progEl.querySelector('.prog-text').textContent =
+                  'Checking ' + completed + ' of ' + items.length + ' names...';
+              }
+              if (completed >= items.length) {
+                resolve(results);
+              } else {
+                runNext();
+              }
+            }).catch(function() {
+              results[idx] = { status: 'error', suggestion: null };
+              completed++;
+              if (completed >= items.length) resolve(results);
+              else runNext();
+            });
+          }
+          // Start `concurrency` workers
+          for (var i = 0; i < Math.min(concurrency, items.length); i++) {
+            runNext();
+          }
+          if (items.length === 0) resolve(results);
+        });
+      }
+
+      async function runNameCheck() {
+        var text = document.getElementById('names-input').value;
+        if (!text.trim()) return;
+
+        var output = document.getElementById('names-output');
+        var infoEl = document.getElementById('names-info');
+        var btn = document.getElementById('names-btn');
+
+        // Call spaCy backend for name extraction
+        var nameGroups;
+        try {
+          btn.disabled = true;
+          btn.textContent = 'Extracting names...';
+          var resp = await fetch(NAME_SERVER + '/extract-names', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+          });
+          if (!resp.ok) throw new Error('Server error: ' + resp.status);
+          var data = await resp.json();
+          nameGroups = data.names;
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = 'Check names';
+          output.innerHTML =
+            '<div class="match-count-summary" style="color:var(--guardian-red)">' +
+            'Could not connect to name server. Make sure <code>python name_server.py</code> is running on port 5001.' +
+            '</div>';
+          return;
+        }
+
+        if (nameGroups.length === 0) {
+          btn.disabled = false;
+          btn.textContent = 'Check names';
+          output.innerHTML = '<div class="match-count-summary">No names detected in your text.</div>';
+          infoEl.textContent = '';
+          return;
+        }
+
+        // Cap at 30 unique names
+        if (nameGroups.length > 30) {
+          nameGroups = nameGroups.slice(0, 30);
+        }
+
+        // Show progress bar
+        output.innerHTML =
+          '<div class="name-progress" id="names-progress">' +
+            '<span class="prog-text">Checking 0 of ' + nameGroups.length + ' names...</span>' +
+            '<div class="bar"><div class="bar-fill" style="width:0%"></div></div>' +
+          '</div>';
+
+        btn.textContent = 'Checking...';
+
+        // Check each name against Wikipedia
+        var results = await throttledMap(nameGroups, function(group) {
+          var name = group.name;
+          // Check cache first
+          if (nameCache[name]) {
+            return Promise.resolve(nameCache[name]);
+          }
+          // Step 1: redirect check
+          return wikiCheckRedirect(name).then(function(result) {
+            if (result.status === 'missing') {
+              // Step 2: opensearch fallback
+              return wikiOpenSearch(name);
+            }
+            return result;
+          }).then(function(result) {
+            nameCache[name] = result;
+            return result;
+          });
+        }, 3);
+
+        btn.disabled = false;
+        btn.textContent = 'Check names';
+
+        // Count results by status
+        var misspelled = 0, correct = 0, notFound = 0, inconclusive = 0;
+        for (var i = 0; i < results.length; i++) {
+          if (results[i].status === 'misspelled') misspelled++;
+          else if (results[i].status === 'correct') correct++;
+          else if (results[i].status === 'inconclusive') inconclusive++;
+          else notFound++;
+        }
+
+        infoEl.textContent = nameGroups.length + ' names found';
+        if (nameGroups.length === 0) {
+          document.getElementById('names-output').innerHTML =
+            '<div class="match-count-summary">No people\'s names detected in your text.</div>';
+          return;
+        }
+        renderNameResults(text, nameGroups, results, misspelled, correct, notFound, inconclusive);
+      }
+
+      function renderNameResults(text, nameGroups, results, misspelled, correct, notFound, inconclusive) {
+        var output = document.getElementById('names-output');
+        var html = '';
+
+        // Summary
+        html += '<div class="match-count-summary">';
+        html += '<strong>' + nameGroups.length + '</strong> name' + (nameGroups.length !== 1 ? 's' : '') + ' checked';
+        if (misspelled > 0) {
+          html += ' &mdash; <strong style="color:var(--guardian-red)">' + misspelled + ' possible misspelling' + (misspelled !== 1 ? 's' : '') + '</strong>';
+        }
+        if (correct > 0) {
+          html += ' &mdash; ' + correct + ' confirmed';
+        }
+        if (inconclusive > 0) {
+          html += ' &mdash; ' + inconclusive + ' inconclusive';
+        }
+        if (notFound > 0) {
+          html += ' &mdash; ' + notFound + ' not on Wikipedia';
+        }
+        html += '</div>';
+
+        // Build a position-to-result map for annotating the text
+        var annotations = []; // {start, end, status, suggestion}
+        for (var i = 0; i < nameGroups.length; i++) {
+          var group = nameGroups[i];
+          var result = results[i];
+          for (var p = 0; p < group.positions.length; p++) {
+            annotations.push({
+              start: group.positions[p].start,
+              end: group.positions[p].end,
+              name: group.name,
+              status: result.status,
+              suggestion: result.suggestion
+            });
+          }
+        }
+        annotations.sort(function(a, b) { return a.start - b.start; });
+
+        // Annotated text
+        html += '<div class="names-annotated">';
+        var lastEnd = 0;
+        for (var j = 0; j < annotations.length; j++) {
+          var ann = annotations[j];
+          html += escapeHtml(text.substring(lastEnd, ann.start));
+          var cls = ann.status === 'correct' ? 'name-ok' :
+                    ann.status === 'misspelled' ? 'name-bad' :
+                    ann.status === 'inconclusive' ? 'name-inconclusive' : 'name-unknown';
+          var title = ann.status === 'misspelled'
+            ? 'Should be: ' + ann.suggestion
+            : ann.status === 'correct' ? 'Confirmed on Wikipedia'
+            : ann.status === 'inconclusive' ? 'Wikipedia match inconclusive' : 'Not found on Wikipedia';
+          html += '<span class="' + cls + '" title="' + escapeHtml(title) + '">';
+          html += escapeHtml(text.substring(ann.start, ann.end));
+          html += '</span>';
+          lastEnd = ann.end;
+        }
+        html += escapeHtml(text.substring(lastEnd));
+        html += '</div>';
+
+        // Results list — misspelled first, then correct, then not found
+        var order = [
+          { status: 'misspelled', label: 'Possible misspellings', items: [] },
+          { status: 'correct', label: 'Confirmed correct', items: [] },
+          { status: 'inconclusive', label: 'Inconclusive', items: [] },
+          { status: 'not_found', label: 'Not found on Wikipedia', items: [] }
+        ];
+        for (var k = 0; k < nameGroups.length; k++) {
+          for (var g = 0; g < order.length; g++) {
+            if (results[k].status === order[g].status) {
+              order[g].items.push({ group: nameGroups[k], result: results[k] });
+            }
+          }
+        }
+
+        for (var s = 0; s < order.length; s++) {
+          if (order[s].items.length === 0) continue;
+          html += '<div class="matched-entries-header">' + order[s].label + ' (' + order[s].items.length + ')</div>';
+          for (var r = 0; r < order[s].items.length; r++) {
+            var item = order[s].items[r];
+            var statusCls = item.result.status === 'correct' ? 'status-correct' :
+                            item.result.status === 'misspelled' ? 'status-misspelled' :
+                            item.result.status === 'inconclusive' ? 'status-inconclusive' : 'status-not-found';
+            var tagCls = item.result.status === 'correct' ? 'correct' :
+                         item.result.status === 'misspelled' ? 'misspelled' :
+                         item.result.status === 'inconclusive' ? 'inconclusive' : 'not-found';
+            var tagText = item.result.status === 'correct' ? 'confirmed' :
+                          item.result.status === 'misspelled' ? 'check spelling' :
+                          item.result.status === 'inconclusive' ? 'inconclusive' : 'not found';
+
+            html += '<div class="name-result ' + statusCls + '">';
+            html += '<div class="name-result-header">';
+            html += '<span class="name-in-text">' + escapeHtml(item.group.name) + '</span>';
+            if (item.result.status === 'misspelled' && item.result.suggestion) {
+              html += '<span class="arrow">\u2192</span>';
+              html += '<span class="name-correct">' + escapeHtml(item.result.suggestion) + '</span>';
+            }
+            html += '<span class="name-status-tag ' + tagCls + '">' + tagText + '</span>';
+            html += '</div>';
+            if (item.result.suggestion) {
+              var wikiUrl = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(item.result.suggestion.replace(/ /g, '_'));
+              html += '<div class="wiki-link"><a href="' + wikiUrl + '" target="_blank" rel="noopener">Wikipedia: ' + escapeHtml(item.result.suggestion) + '</a></div>';
+            }
+            html += '</div>';
+          }
+        }
+
+        output.innerHTML = html;
+      }
+
+      // ============================================================
+      // SEARCH TAB — Letter Nav & Rendering
+      // ============================================================
+
+      function buildLetterNav() {
+        var nav = document.getElementById('letter-nav');
+        var letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+        for (var i = 0; i < letters.length; i++) {
+          (function(letter) {
+            var btn = document.createElement('button');
+            btn.textContent = letter;
+            btn.dataset.letter = letter;
+            btn.addEventListener('click', function() {
+              document.getElementById('search').value = '';
+              activeLetter = letter;
+              setActiveNav(letter);
+              showSection(letter);
+            });
+            nav.appendChild(btn);
+          })(letters[i]);
+        }
+      }
+
+      function setActiveNav(letter) {
+        var buttons = document.querySelectorAll('.letter-nav button');
+        buttons.forEach(function(btn) {
+          btn.classList.toggle('active', btn.dataset.letter === letter);
+        });
+      }
+
+      function onSearch() {
+        var query = document.getElementById('search').value.trim();
+        if (query.length < 2) {
+          if (activeLetter) {
+            showSection(activeLetter);
+          } else {
+            showWelcome();
+            updateInfo('');
+          }
+          return;
+        }
+
+        activeLetter = null;
+        setActiveNav(null);
+        var results = search(query);
+        var label = results.length + ' result' + (results.length !== 1 ? 's' : '') +
+          ' for \u201c' + query + '\u201d';
+        updateInfo(label);
+        renderSearchResults(results, query);
+      }
+
+      function showWelcome() {
+        var container = document.getElementById('results');
+        container.innerHTML =
+          '<div class="welcome">' +
+            '<p class="big">Search ' + allEntries.length.toLocaleString() + ' entries</p>' +
+            '<p>Type to search by word, phrase, or concept</p>' +
+            '<p>Or click a letter above to browse</p>' +
+          '</div>';
+      }
+
+      function renderSearchResults(results, query) {
+        var container = document.getElementById('results');
+        if (results.length === 0) {
+          container.innerHTML = '<div class="no-results">No entries found for \u201c' +
+            escapeHtml(query) + '\u201d</div>';
+          return;
+        }
+
+        var html = '';
+        for (var i = 0; i < results.length; i++) {
+          var item = results[i].entry;
+          var termHtml = highlightInHtml(escapeHtml(item.term), query);
+          var bodyHtml = item.body_html ? highlightInHtml(item.body_html, query) : '';
+          var aliasHtml = '';
+          if (item.aliases && item.aliases.length) {
+            aliasHtml = '<div class="entry-aliases">Also: ' +
+              item.aliases.map(function(a) { return highlightInHtml(escapeHtml(a), query); }).join(', ') +
+              '</div>';
+          }
+          html += entryHtml(termHtml, aliasHtml, bodyHtml);
+        }
+        container.innerHTML = html;
+      }
+
+      function showSection(letter) {
+        var container = document.getElementById('results');
+        var entries = allEntries.filter(function(e) { return e.section === letter; });
+        var html = '<div class="section-divider">' + letter + '</div>';
+        for (var i = 0; i < entries.length; i++) {
+          var e = entries[i];
+          var aliasHtml = '';
+          if (e.aliases && e.aliases.length) {
+            aliasHtml = '<div class="entry-aliases">Also: ' + e.aliases.map(escapeHtml).join(', ') + '</div>';
+          }
+          html += entryHtml(escapeHtml(e.term), aliasHtml, e.body_html || '');
+        }
+        container.innerHTML = html;
+        updateInfo(entries.length + ' entries in ' + letter);
+        window.scrollTo(0, 0);
+      }
+
+      function entryHtml(termHtml, aliasHtml, bodyHtml) {
+        return '<div class="entry">' +
+          '<div class="entry-term">' + termHtml + '</div>' +
+          aliasHtml +
+          (bodyHtml ? '<div class="entry-body">' + bodyHtml + '</div>' : '') +
+          '</div>';
+      }
+
+      // ---- Highlighting (search tab) ----
+      function highlightInHtml(html, query) {
+        var words = query.split(/\s+/).filter(function(w) { return w.length >= 2; });
+        if (!words.length) return html;
+
+        var pattern = new RegExp(
+          '(' + words.map(function(w) {
+            return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          }).join('|') + ')',
+          'gi'
+        );
+
+        return html.replace(/(<[^>]*>)|([^<]+)/g, function(match, tag, text) {
+          if (tag) return tag;
+          return text.replace(pattern, '<mark>$1</mark>');
+        });
+      }
+
+      // ---- Utilities ----
+      function debounce(fn, ms) {
+        var timer;
+        return function() {
+          clearTimeout(timer);
+          timer = setTimeout(fn, ms);
+        };
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      function escapeRegex(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+
+      function updateInfo(text) {
+        document.getElementById('info-text').textContent = text;
+      }
+
+      // Start
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>
